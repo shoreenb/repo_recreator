@@ -1,87 +1,65 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-
+// import {Button} from 'react-bootstrap'
+import Cards from "./Cards";
 
 function Search() {
-  const [students, setStudents] = useState([]);
-  const [cohort, setCohort] = useState('');
-  const [search, setSearch] = useState('');
-  const [error, setError] = useState('');
-  const [statusMessage, setStatusMessage] = useState('Loading');
+    const [lyrics, setLyrics] = useState(["None"])
+    const [search, setSearch] = useState('');
+    const [input, setInput] = useState('');
+   
 
-
+    // const handleBtnClick = () =>{
+    //    console.log(lyrics)
+    // }
 
   useEffect(() => {
 
-    const fetchStudents = async (searchTerm) => {
-      searchTerm ||= 'shoreenb'
+    const fetchLyrics = async (searchTerm) => {
       try {
-        const url = `https://api.github.com/users/${searchTerm}/repos` 
-
-        // const { data: { students } } = await axios.get(url)
-        const { data } = await axios.get(url)
-        console.log('I was mounted')
-        setStudents(data.students)
-        setStatusMessage('')
-        setError('')
+        searchTerm ||= 'shoreenb'
+        const url = `https://api.github.com/users/${searchTerm}/repos`;
+        const { data } = await axios.get(url);
+        console.log(data)
+        console.log(data.name);
+        setLyrics(data.lyrics);
+       
       } catch (err) {
-        setError(err)
-        setStatusMessage('Loading...')
+        console.log(err)
       }
     }
-    const timeoutId = setTimeout(() => {
-      fetchStudents(search)
-    }, 400);
-
-    return () => {
-      clearTimeout(timeoutId)
-    }
-
+    fetchLyrics(search)
   }, [search])
 
   // nothing => useEffect will run like crazy
   // [] => useEffect will run once
   // [search] => useEffect will run everytime the value changes
 
-  console.log(cohort)
-  const renderedStudents = students.map(st => {
-    return (
-      <li key={st.github}>{st.name}</li>
-    )
-  })
-
-  const onInputChange = (e) => {
-    setCohort(e.target.value)
-  }
-
   const onFormSubmit = (e) => {
     e.preventDefault()
-    setSearch(cohort)
-    setCohort('')
+    setSearch(input)
+    setInput('')
   }
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {error
-          ? <h1>Sorry, we could not find a(n) {search} cohort</h1>
-          : <div>
-            <h3> {statusMessage ? statusMessage : ''} </h3>
-            <ul> {renderedStudents} </ul>
-          </div>
-        }
+    <>
+    <p>{lyrics}</p>
+    
+     {/* <Button variant="primary" onClick={()=> handleBtnClick()}>Get Lyrics</Button> */}
 
-        <form onSubmit={onFormSubmit}>
-          <label htmlFor="cohort">Cohort</label>
+     <form onSubmit={onFormSubmit}>
+          <label htmlFor="input">Search Username </label>
           <input
             type="text"
-            id="cohort"
-            value={cohort}
-            onChange={onInputChange}
+            id="input"
+            value={input}
+            onChange={e => setInput(e.target.value)}
           />
         </form>
-      </header>
-    </div>
+
+        <Cards album="hi" year="1995"/>
+    </>
+  
   );
 }
 
