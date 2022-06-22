@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 // import {Button} from 'react-bootstrap'
-import Cards from "./Cards";
+import Cards from "./Cards"
+import Row from 'react-bootstrap/Row';
 
 function Search() {
-    const [lyrics, setLyrics] = useState(["None"])
+ 
     const [search, setSearch] = useState('');
     const [input, setInput] = useState('');
+    const [repos, setRepos] = useState([]);
+
    
 
     // const handleBtnClick = () =>{
@@ -15,21 +18,23 @@ function Search() {
 
   useEffect(() => {
 
-    const fetchLyrics = async (searchTerm) => {
+    const fetchRepos = async (searchTerm) => {
       try {
         searchTerm ||= 'shoreenb'
         const url = `https://api.github.com/users/${searchTerm}/repos`;
         const { data } = await axios.get(url);
         console.log(data)
         console.log(data.name);
-        setLyrics(data.lyrics);
+        setRepos(data);
        
       } catch (err) {
         console.log(err)
       }
     }
-    fetchLyrics(search)
+    fetchRepos(search)
   }, [search])
+
+ 
 
   // nothing => useEffect will run like crazy
   // [] => useEffect will run once
@@ -43,8 +48,8 @@ function Search() {
 
   return (
     <>
-    <p>{lyrics}</p>
-    
+  
+
      {/* <Button variant="primary" onClick={()=> handleBtnClick()}>Get Lyrics</Button> */}
 
      <form onSubmit={onFormSubmit}>
@@ -57,7 +62,14 @@ function Search() {
           />
         </form>
 
-        <Cards album="hi" year="1995"/>
+
+        <div className='row-wrapper'>
+        <Row>
+           {repos.map(repo => (
+            <Cards key={repo.id} name={repo.name} />
+          ))}  
+        </Row>
+      </div>
     </>
   
   );
